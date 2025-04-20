@@ -34,31 +34,34 @@ void loop() {
   // Weather Reading every 5 minutes, sent over serial to backend for database write
   if (now - previousMillisWeatherReading >= 300000) {
     previousMillisWeatherReading = now;
-    wind_reading windReading = anemometer.getWindReading();
-    thbs_reading thbsReading = thbs.getTHBSReading();
-
-    StaticJsonDocument<128> weatherPayload;
-
-    weatherPayload["rain"] = raingauge.getRainReading();
-    weatherPayload["baro"] = thbsReading.baro;
-    weatherPayload["humid"] = thbsReading.humid;
-    weatherPayload["airtemp"] = thbsReading.temp;
-    weatherPayload["solar"] = thbsReading.solar;
-
-    JsonObject wslow = weatherPayload.createNestedObject("wslow");
-    wslow["sp"] = windReading.lowSpeed.speed;
-    wslow["dir"] = windReading.lowSpeed.direction;
-
-    JsonObject wsmean = weatherPayload.createNestedObject("wsmean");
-    wsmean["sp"] = windReading.meanSpeed.speed;
-    wsmean["dir"] = windReading.meanSpeed.direction;
-
-    JsonObject wshigh = weatherPayload.createNestedObject("wshigh");
-    wshigh["sp"] = windReading.peakSpeed.speed;
-    wshigh["dir"] = windReading.peakSpeed.direction;
-
-    serializeJson(weatherPayload, Serial);
-    Serial.println();
+    takeWeatherReading();
   }
+}
 
+void takeWeatherReading() {
+  wind_reading windReading = anemometer.getWindReading();
+  thbs_reading thbsReading = thbs.getTHBSReading();
+
+  StaticJsonDocument<128> weatherPayload;
+
+  weatherPayload["rain"] = raingauge.getRainReading();
+  weatherPayload["baro"] = thbsReading.baro;
+  weatherPayload["humid"] = thbsReading.humid;
+  weatherPayload["airtemp"] = thbsReading.temp;
+  weatherPayload["solar"] = thbsReading.solar;
+
+  JsonObject wslow = weatherPayload.createNestedObject("wslow");
+  wslow["sp"] = windReading.lowSpeed.speed;
+  wslow["dir"] = windReading.lowSpeed.direction;
+
+  JsonObject wsmean = weatherPayload.createNestedObject("wsmean");
+  wsmean["sp"] = windReading.meanSpeed.speed;
+  wsmean["dir"] = windReading.meanSpeed.direction;
+
+  JsonObject wshigh = weatherPayload.createNestedObject("wshigh");
+  wshigh["sp"] = windReading.peakSpeed.speed;
+  wshigh["dir"] = windReading.peakSpeed.direction;
+
+  serializeJson(weatherPayload, Serial);
+  Serial.println();
 }
